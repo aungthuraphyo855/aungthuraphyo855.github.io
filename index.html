@@ -1,280 +1,174 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Knowledge Panel — My Profile</title>
-  <meta name="description" content="Compact knowledge-panel style profile with structured data (JSON-LD)." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aung Thu Ra Phyo — Knowledge Panel</title>
+  <link rel="stylesheet" href="style.css" />
 
-  <style>
-    :root{
-      --bg1: linear-gradient(135deg,#0f172a 0%, #0b1220 50%, #082033 100%);
-      --card-bg: rgba(255,255,255,0.04);
-      --glass: rgba(255,255,255,0.06);
-      --accent: #6ee7b7;
-      --muted: rgba(255,255,255,0.7);
-      --glass-border: rgba(255,255,255,0.08);
-      --shadow: 0 6px 20px rgba(2,6,23,0.6);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-
-    html,body{height:100%;margin:0;background:var(--bg1);color:white;-webkit-font-smoothing:antialiased}
-    .wrap{
-      max-width:1100px;margin:40px auto;padding:28px;
-      display:grid;grid-template-columns: 340px 1fr;gap:28px;
-    }
-
-    /* Card */
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border:1px solid var(--glass-border);
-      border-radius:14px;padding:20px;box-shadow:var(--shadow);
-      backdrop-filter: blur(6px);
-    }
-
-    /* Profile */
-    .profile {
-      display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
-    }
-    .avatar{
-      width:120px;height:120px;border-radius:999px;border:4px solid rgba(255,255,255,0.08);
-      overflow:hidden;display:inline-block;
-      box-shadow:0 8px 30px rgba(0,0,0,0.6);
-    }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    h1.name{font-size:20px;margin:0;font-weight:700}
-    .meta{font-size:13px;color:var(--muted);margin-top:2px}
-    .badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-    .badge{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-           border:1px solid rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px;font-size:12px}
-
-    /* Info list */
-    .info-list{margin-top:12px;text-align:left;font-size:14px}
-    .info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
-    .info-row:last-child{border-bottom:none}
-    .label{color:rgba(255,255,255,0.75)}
-    .value{color:var(--muted)}
-
-    /* Right panel: graph + details */
-    .right{
-      display:flex;flex-direction:column;gap:18px;
-    }
-
-    .panel-top{display:flex;gap:18px;align-items:center}
-    .panel-card{
-      flex:1;padding:18px;border-radius:12px;background:var(--card-bg);border:1px solid var(--glass-border)
-    }
-
-    /* Graph box */
-    .graph{
-      height:300px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
-    }
-
-    /* nodes */
-    .node{
-      position:absolute;padding:10px 12px;border-radius:10px;background:rgba(10,20,30,0.6);
-      border:1px solid rgba(255,255,255,0.06);backdrop-filter: blur(4px);font-size:13px;
-      display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,0.5);
-      transition:transform .25s ease, box-shadow .25s ease;
-    }
-    .node:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(2,6,23,0.7)}
-    .node .dot{width:12px;height:12px;border-radius:999px;background:var(--accent);box-shadow:0 2px 8px rgba(110,231,183,0.18)}
-
-    /* positions */
-    .n-main{left:40%;top:45%;transform:translate(-50%,-50%);padding:14px 16px;border-radius:14px}
-    .n-1{left:15%;top:18%}
-    .n-2{right:12%;top:12%}
-    .n-3{left:6%;bottom:12%}
-    .n-4{right:18%;bottom:18%}
-    .n-5{left:48%;top:8%}
-
-    /* small details */
-    .short-bio{color:var(--muted);font-size:14px;line-height:1.5}
-    .links{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center}
-    .link-btn{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);font-size:13px;text-decoration:none;color:var(--muted)}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);font-size:12px}
-
-    /* bottom details */
-    .details{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .detail-card{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
-    .detail-card h3{margin:0;font-size:13px}
-    .detail-card p{margin:6px 0 0;font-size:13px;color:var(--muted)}
-
-    /* responsive */
-    @media (max-width:880px){
-      .wrap{grid-template-columns:1fr; padding:18px}
-      .panel-top{flex-direction:column}
-      .details{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:520px){
-      .details{grid-template-columns:1fr}
-      .graph{height:260px}
-      .avatar{width:96px;height:96px}
-    }
-
-    /* subtle SVG lines */
-    .connections{position:absolute; inset:0; pointer-events:none}
-    svg line{stroke:rgba(255,255,255,0.06);stroke-width:1.2;stroke-linecap:round}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <!-- LEFT: Profile Card -->
-    <div class="card">
-      <div class="profile">
-        <div class="avatar" title="Profile image">
-          <!-- Replace src with your image URL -->
-          <img src="PROFILE_IMG_URL" alt="Profile">
-        </div>
-        <h1 class="name">Your Name</h1>
-        <div class="meta">Web Developer · Researcher · Content Creator</div>
-
-        <div class="badges" style="margin-top:8px">
-          <span class="badge">Myanmar</span>
-          <span class="badge">Open Source</span>
-          <span class="badge">Speaker</span>
-        </div>
-
-        <div class="info-list" style="width:100%;margin-top:12px">
-          <div class="info-row"><div class="label">Born</div><div class="value">Jan 1, 1990</div></div>
-          <div class="info-row"><div class="label">Occupation</div><div class="value">Software Engineer</div></div>
-          <div class="info-row"><div class="label">Website</div><div class="value">aungthuraphyo855.github.io</div></div>
-          <div class="info-row"><div class="label">Known for</div><div class="value">Frontend & Open-source</div></div>
-        </div>
-
-        <div class="links" style="width:100%;margin-top:12px">
-          <a class="link-btn" href="#" target="_blank">GitHub</a>
-          <a class="link-btn" href="#" target="_blank">LinkedIn</a>
-          <a class="link-btn" href="#" target="_blank">Twitter</a>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- RIGHT: Graph & Details -->
-    <div class="right">
-      <div class="panel-top">
-        <div class="panel-card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <strong style="font-size:16px">Knowledge Snapshot</strong>
-              <div style="font-size:13px;color:var(--muted);margin-top:6px">Concise facts and relationships (graph-style).</div>
-            </div>
-            <div style="text-align:right">
-              <span class="pill">Verified</span>
-            </div>
-          </div>
-
-          <div class="graph" style="margin-top:14px">
-            <!-- SVG lines for connections -->
-            <div class="connections" aria-hidden="true">
-              <svg width="100%" height="100%" viewBox="0 0 1000 400" preserveAspectRatio="none">
-                <!-- Line coordinates chosen to roughly match .node positions -->
-                <line x1="330" y1="200" x2="150" y2="70"></line>
-                <line x1="330" y1="200" x2="840" y2="50"></line>
-                <line x1="330" y1="200" x2="70" y2="320"></line>
-                <line x1="330" y1="200" x2="880" y2="320"></line>
-                <line x1="330" y1="200" x2="480" y2="40"></line>
-              </svg>
-            </div>
-
-            <!-- Nodes -->
-            <div class="node n-main" style="background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));">
-              <div class="dot"></div>
-              <div>
-                <div style="font-weight:700">Your Name</div>
-                <div style="font-size:12px;color:var(--muted)">Web Developer</div>
-              </div>
-            </div>
-
-            <div class="node n-1">
-              <div class="dot"></div><div>Projects<div style="font-size:12px;color:var(--muted)">10+ Open-source</div></div>
-            </div>
-
-            <div class="node n-2">
-              <div class="dot"></div><div>Publications<div style="font-size:12px;color:var(--muted)">Articles & Talks</div></div>
-            </div>
-
-            <div class="node n-3">
-              <div class="dot"></div><div>Affiliations<div style="font-size:12px;color:var(--muted)">University / Org</div></div>
-            </div>
-
-            <div class="node n-4">
-              <div class="dot"></div><div>Awards<div style="font-size:12px;color:var(--muted)">Best Dev 2023</div></div>
-            </div>
-
-            <div class="node n-5">
-              <div class="dot"></div><div>Topics<div style="font-size:12px;color:var(--muted)">Frontend, SEO</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-card" style="min-width:220px;max-width:320px;">
-          <strong>Short Bio</strong>
-          <p class="short-bio" style="margin-top:8px">
-            short-bio — ရိုးရှင်းပေမယ့် ထိရောက်စွာ ရေးထားပါ။
-          </p>
-
-          <div style="margin-top:12px">
-            <strong style="font-size:13px">Quick facts</strong>
-            <ul style="margin:8px 0 0 18px;color:var(--muted);font-size:13px;line-height:1.6">
-              <li>Location: Yangon, Myanmar</li>
-              <li>Languages: Burmese, English</li>
-              <li>Available for: Speaking & Collaboration</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="details">
-        <div class="detail-card">
-          <h3>Top Projects</h3>
-          <p>ProjectA · ProjectB · ProjectC</p>
-        </div>
-        <div class="detail-card">
-          <h3>Recent Talk</h3>
-          <p>"Modern Frontend", June 2025</p>
-        </div>
-        <div class="detail-card">
-          <h3>Contact</h3>
-          <p>email@example.com</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Structured data (JSON-LD) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Person",
-    "name": "Your Name",
-    "url": "https://aungthuraphyo855.github.io/",
-    "image": "https://aungthuraphyo855.github.io/profile.jpg",
+    "name": "Aung Thu Ra Phyo",
+    "birthDate": "2006-05-07",
+    "birthPlace": "Paung, Paung Township, Mon State, Myanmar",
+    "height": "1.65 m",
+    "jobTitle": ["Actor", "Model"],
+    "alumniOf": "Mawlamyine University",
+    "nationality": "Burmese",
     "sameAs": [
-      "https://github.com/yourusername",
-      "https://www.linkedin.com/in/yourusername",
-      "https://twitter.com/yourusername"
-    ],
-    "jobTitle": "Web Developer",
-    "birthDate": "1990-01-01",
-    "description": "Short one-line bio about the person."
+      "https://www.imdb.com/name/nm17681922/",
+      "https://www.instagram.com/aungthuraphyo855",
+      "https://www.facebook.com/share/1AfbctDjRR/",
+      "https://www.youtube.com/@aungthuraphyo855?feature=shared"
+    ]
   }
   </script>
+</head>
+<body>
+  <div class="panel">
+    <div class="header">
+      <img src="profile.jpg" alt="Aung Thu Ra Phyo" />
+      <h1>Aung Thu Ra Phyo</h1>
+      <p>Burmese Actor & Model</p>
+    </div>
 
-  <!-- small script: optional tiny floating animation for nodes -->
-  <script>
-    // gentle float animation
-    const nodes = document.querySelectorAll('.node');
-    nodes.forEach((n, i) => {
-      const dur = 4000 + (i*600);
-      n.animate([
-        { transform: 'translateY(0px)' },
-        { transform: 'translateY(-6px)' },
-        { transform: 'translateY(0px)' }
-      ], { duration: dur, iterations: Infinity, easing: 'ease-in-out' });
-    });
-  </script>
+    <div class="info">
+      <p><strong>Born:</strong> 7 May 2006</p>
+      <p><strong>Birthplace:</strong> Paung, Paung Township, Mon State</p>
+      <p><strong>Height:</strong> 1.65 m</p>
+      <p>
+        <strong>Education:</strong> Mathematics, Mawlamyine University
+      </p>
+      <p><strong>Occupation:</strong> Actor, Model</p>
+    </div>
+
+    <div class="bio">
+      <h2>Biography</h2>
+      <p>
+        Aung Thu Ra Phyo (born 7 May 2006) is a Burmese actor and model. He is
+        currently studying Mathematics at Mawlamyine University while pursuing
+        his acting and modeling career. He was born in Paung, Paung Township,
+        Mon State, and stands at 1.65 m tall.
+      </p>
+      <p>
+        He has appeared in various modeling and acting projects, gaining
+        recognition for his presence and style. He continues striving to
+        balance his academic life with his career in the entertainment
+        industry, aiming to inspire Burmese youth to follow their passions.
+      </p>
+    </div>
+
+    <div class="social">
+      <h2>Connect with me</h2>
+      <div class="social-links">
+        <a href="https://www.imdb.com/name/nm17681922/" target="_blank" title="IMDb">IMDb</a>
+        <a href="https://www.instagram.com/aungthuraphyo855" target="_blank" title="Instagram">Instagram</a>
+        <a href="https://www.facebook.com/share/1AfbctDjRR/" target="_blank" title="Facebook">Facebook</a>
+        <a href="https://www.youtube.com/@aungthuraphyo855?feature=shared" target="_blank" title="YouTube">YouTube</a>
+      </div>
+    </div>
+  </div>
 </body>
-                                                                                                             </html>
+</html>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  margin: 0;
+  padding: 20px;
+}
+
+.panel {
+  max-width: 480px;
+  margin: auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  text-align: center;
+}
+
+.header img {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border: 4px solid #ddd;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 26px;
+  color: #222;
+}
+
+.header p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 16px;
+}
+
+.info {
+  margin-top: 22px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.info p {
+  margin: 7px 0;
+}
+
+.bio {
+  margin-top: 24px;
+}
+
+.bio h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.bio p {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.social {
+  margin-top: 26px;
+  text-align: center;
+}
+
+.social h2 {
+  font-size: 20px;
+  margin-bottom: 14px;
+  color: #333;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.social-links a {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #0073e6;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.social-links a:hover {
+  background: #005bb5;
+}
